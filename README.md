@@ -3,8 +3,8 @@ plugin_markmin_extras
 
 A web2py plugin providing extra syntax for the markmin markup language (a variant of markdown).
 
-Created by Ian W. Scott (@monotasker)  
-Copyright Ian W. Scott, 2014  
+Created by Ian W. Scott (monotasker) 
+Copyright Ian W. Scott, 2014 
 Released under the MIT open-source license (see the included license file)  
 
 Overview
@@ -18,8 +18,10 @@ image_by_title
 audio_by_title  
 : Similar to image_by_title, but embeds an audio file (as an html5 audio element). Again, the file is referenced by its title field in a database table dedicated to audio uploads.
 
-upload_by_title  
-: Include a link to an upload file, referenced by the title field of the file in the db table used to store the uploads. I use it primarily for pdf files, but it can be used to link to anything.
+doc_by_title 
+: Include a link to an upload file, referenced by the title field of the file 
+in the db table used to store the uploads. I use it primarily for pdf files, 
+but it can be used to link to anything.
 
 In addition to simplifying your workflow with uploads stored in the file system, these additions allow you to use upload files that are stored as binary blobs in a database field. Because the syntax pulls the file from the upload field of a database table, it is agnostic as to the mode of storage.
 
@@ -66,9 +68,9 @@ When you create your MARKMIN helper object, add mm_extras like this:
 
 In your markmin content, use the additional syntax like this:
 
-    ``image_by_title: mygreattitle``
-    ``audio_by_title: mygreattitle``
-    ``upload_by_title: mygreattitle``
+    ``mygreattitle:``:image_by_title
+    ``mygreattitle``:audio_by_title
+    ``mygreattitle``:doc_by_title
 
 Note that the double back-ticks surrounding the markup statement are required. This is a constraint of markmin's native syntax for custom extensions.
 
@@ -76,4 +78,6 @@ Note that the double back-ticks surrounding the markup statement are required. T
 Configuration
 --------------
 
-At the moment you will need to change the table and field names of your media records manually in the modules/plugin_markmin_extras.py file. I plan to simplify this soon by using web2py's plugin configuration hooks.
+At the moment you will need to change the table and field names of your media 
+records manually in the modules/plugin_markmin_extras.py file. I plan to 
+simplify this at some point by using web2py's plugin configuration hooks.
