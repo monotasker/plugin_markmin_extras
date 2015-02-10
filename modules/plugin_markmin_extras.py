@@ -11,8 +11,8 @@ file, or a generic uploaded document. Rather than having to know the full
 filename (which web2py obscures for uploaded files), the file can be identified
 by its assigned title in the database table which handles that upload type.
 
-``mygreattitle:``image_by_title
-``mygreattitle:``audio_by_title
+``mygreattitle``:image_by_title
+``mygreattitle``:audio_by_title
 ``mygreattitle``:doc_by_title
 
 To access these markmin extensions, include the "extra" parameter when you
@@ -53,15 +53,28 @@ def maketag(td, t, txt):
               ).xml()
     return url
 
+# any variable names in this dict can be called in markmin code using
+# the ``mytext``:varname syntax.
 mm_extras = dict(img_by_title=lambda text: maketag(td, 'image', text),
                  audio_by_title=lambda text: maketag(td, 'audio', text),
                  doc_by_title=lambda text: '<a href={}>{}</a> '
-                    ''.format(URL('blog/plugin_markmin_extras', 'download',
-                                  [d['docfile'] for d in docrows
+                     ''.format(URL('blog/plugin_markmin_extras', 'download',
+                                   [d['docfile'] for d in docrows
                                    if d['label'] == text][0]
-                                  ),
-                              text),
+                                   ),
+                               text),
                  youtube=lambda text: '<iframe width="560" height="315" '
-                    'src="https://www.youtube.com/embed/{}" frameborder="0" '
-                    'allowfullscreen></iframe>'.format(text)
+                     'src="https://www.youtube.com/embed/{}" frameborder="0" '
+                     'allowfullscreen></iframe>'.format(text),
+                 img=lambda text: '<img class="center" src="{}" '
+                     '/>'.format(URL('static/images', [i for i in imgrows
+                                     if i['title'] == text][0]['image'])),
+                 img_r=lambda text: '<img class="pull-right" src="{}" '
+                     '/>'.format(URL('static/images', [i for i in imgrows
+                                     if i['title'] == text][0]['image'])),
+                 img_l=lambda text: '<img src="{}" class="pull-left" '
+                     '/>'.format(URL('static/images', [i for i in imgrows
+                                     if i['title'] == text][0]['image'])),
+                 audio=lambda text: [i for i in audrows
+                                     if i['title'] == text][0]['audio']
                  )
