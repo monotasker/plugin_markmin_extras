@@ -28,42 +28,41 @@ packaged plugin) to provide download access to the files.
 from gluon import current, URL
 db = current.db
 
+# FIXME: need better way of normalizing db calls across apps
+imgtbls = ['blog_images', 'woh_images', 'paideia_images', 'images']
+imgtable = [db[t] for t in imgtbls if t in db.tables][0]
+imgrows = db(imgtable['id'] > 0).select().as_list()
 
-# user configured table and field sources
-tag_types = {'image': ['blog_images', 'image_title', 'img_file'],
-             'audio': ['woh_audio', 'audio_title', 'audio_file_mp3', 'audio_file_ogg'],
-             'upload': ['docs', 'label', 'docfile']
-             }
-
-td = {tag_type: {'table': db[data[0]],
-                 'titlefield': db[data[0]][data[1]],
-                 'filefield': db[data[0]][data[2]]}
-      for tag_type, data in tag_types.iteritems()}
-
-imgrows = db(db.blog_images.id > 0).select().as_list()
-imgrows2 = db(db.woh_images.id > 0).select().as_list()
-audrows = db(db.woh_audio.id > 0).select().as_list()
-docrows = db(db.docs.id > 0).select().as_list()
+audtbls = ['woh_audio', 'paideia_audio', 'audio']
+audtable = [db[t] for t in audtbls if t in db.tables][0]
+audrows = db(audtable['id'] > 0).select().as_list()
 
 
-def maketag(td, t, txt):
-    """docstring for ma"""
+def maketag(tbl, ttf, flf, txt):
+    """docstring for maketag"""
+    tbl = tbl if isinstance(tbl, list) else [tbl]
+    mytbl = [db[t] for t in tbl if t in db.tables]
+    if not mytbl:
+        return False
     url = URL('plugin_markmin_extras', 'download',
-              td[t]['table'](td[t]['titlefield'] == txt)[td[t]['filefield']]
+              mytbl(mytbl[ttf] == txt)[mytbl[flf]]
               ).xml()
     return url
 
 # any variable names in this dict can be called in markmin code using
 # the ``mytext``:varname syntax.
-mm_extras = dict(img_by_title=lambda text: maketag(td, 'image', text),
-                 audio_by_title=lambda text: maketag(td, 'audio', text),
-                 doc_by_title=lambda text: '<a href={}>{}</a> '
-                     ''.format(URL('blog/plugin_markmin_extras', 'download',
-                                   [d['docfile'] for d in docrows
-                                   if d['label'] == text][0]
-                                   ),
-                               text),
+mm_extras = dict(img_by_title=lambda text: maketag(['blog_images', 'woh_images',
+                                                    'paideia_images', 'images'],
+                                                   'image_title',
+                                                   'img_file', text),
+                 audio_by_title=lambda text: maketag(['woh_audio', 'paideia_audio',
+                                                      'audio'],
+                                                     'audio_title',
+                                                     'audio_file_mp3', text),
+                 doc_by_title=lambda text: maketag(['docs'], 'label',
+                                                   'docfile', text),
                  youtube=lambda text: '<iframe width="560" height="315" '
+                     'style="margin:0 auto; display:block;" '
                      'src="https://www.youtube.com/embed/{}" frameborder="0" '
                      'allowfullscreen></iframe>'.format(text),
                  img=lambda text: '<img class="center" src="{}" '
