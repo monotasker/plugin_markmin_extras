@@ -56,10 +56,12 @@ maketag = lambda(t, txt): URL('plugin_markmin_extras', 'download',
 mm_extras = dict(img_by_title=lambda text: maketag('image', text),
                  audio_by_title=lambda text: maketag('audio', text),
                  doc_by_title=lambda text: '<a href={}>{}</a> '
-                                           ''.format(URL('blog/plugin_markmin_extras',
-                                                         'download',
-                                                         [d['docfile'] for d in docrows if d['label'] == text][0]
-                                                         ),
-                                                     text
-                                                     )
+                    ''.format(URL('blog/plugin_markmin_extras', 'download',
+                                  [d['docfile'] for d in docrows
+                                   if d['label'] == text][0]
+                                  ),
+                              text),
+                 youtube=lambda text: '<iframe width="560" height="315" '
+                    'src="https://www.youtube.com/embed/{}" frameborder="0" '
+                    'allowfullscreen></iframe>'.format(text)
                  )
